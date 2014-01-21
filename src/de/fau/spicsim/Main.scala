@@ -45,7 +45,7 @@ object Main {
 	def openFile(){
 		val chooser = new JFileChooser(lastpath);
 		if(chooser.showOpenDialog(gui.getFrame) !=  JFileChooser.APPROVE_OPTION) return;
-		sim = new SPiCSim(chooser.getSelectedFile,gui.leds, gui.sSeg.reverse)
+		sim = new SPiCSim(chooser.getSelectedFile,gui.leds, gui.sSeg.reverse, Array(gui.adcLight, gui.adcPoti), Array(gui.btnT1, gui.btnT2))
 		sim.start
 	}
 

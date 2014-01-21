@@ -18,21 +18,29 @@ import avrora.sim.clock.MainClock
 import de.fau.spicsim.gui.SevenSeg
 import java.awt.Color
 import de.fau.spicsim.dev.LedDev
+import java.awt.Adjustable
+import scala.collection.mutable.SynchronizedQueue
+import javax.swing.JButton
+import avrora.sim.mcu.ADC
+import avrora.sim.mcu.AtmelMicrocontroller
 
 
 
-class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg]) {
+class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg], adc:Array[Adjustable], pins:Array[JButton]) {
 
 	var freq  = 1 * 1000 * 1000 // 1 MHz
 	var isrunning = false
 
+	
+	
+	val evq = new SynchronizedQueue[Tuple2[Simulator.Event, Int]]()
 	
 	val p = new LoadableProgram(file);
 	p.load();
 	
 	var sim = avrora.Defaults.newSimulator(0, "atmega32", freq, freq, p.getProgram())
 	
-	val mcu = sim.getMicrocontroller
+	val mcu = sim.getMicrocontroller.asInstanceOf[AtmelMicrocontroller]
 	
 	val interp = sim.getInterpreter.asInstanceOf[AtmelInterpreter]
 	
@@ -40,9 +48,24 @@ class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg
 
 	val thread = new SPiCSimThread
 	
+	val mcuadc = mcu.getDevice("adc").asInstanceOf[ADC]
+	mcuadc.setVoltageRef(5)
+	
+	
+	///Connect
+	
+	
 	val ledwatch = new LedDev(sim, leds)
 	
 	val segwatch = new dev.SevenSegDev(sim, sSeg)
+	
+	val adcdev = new dev.AdcDev(sim,adc)
+	
+	
+	
+	
+	
+	val pindev = new dev.PinDev(this, sim, pins)
 	
 	
 	
@@ -58,8 +81,11 @@ class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg
 	
 	class SPiCSimThread extends Thread{
 		
+		
+		
 		override
 		def run(){
+			
 			
 			var starttime = System.currentTimeMillis
 			while(isrunning){
@@ -73,15 +99,20 @@ class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg
 				
 				var torun = runticks - clock.getCount()
 				
-				if(torun < clock.millisToCycles(10)){ //There is some time left 
-					Thread.sleep(10);
-					torun += clock.millisToCycles(10)
-				} else {
+				if(torun < clock.millisToCycles(5)){ //There is some time left 
+					Thread.sleep(5);
+					torun += clock.millisToCycles(5)
+				} else if(torun > clock.millisToCycles(10)) {
 					println("behind")
 				}
 				
 				while(torun > 0){
 					torun -= sim.step
+					if(!evq.isEmpty){
+						for(e <- evq.dequeueAll(_ => true)){
+							sim.insertEvent(e._1,e._2)
+						}
+					}
 				} 
 
 			}

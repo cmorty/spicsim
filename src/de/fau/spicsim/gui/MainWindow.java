@@ -20,6 +20,11 @@ public class MainWindow {
 	public JButton btnLoad;
 	public JButton btnStop;
 	
+	public JScrollBar adcPoti;
+	public JScrollBar adcLight;
+	public JButton btnT2;
+	public JButton btnT1;
+	
 	public Frame getFrame(){
 		return frame;
 	}
@@ -99,28 +104,36 @@ public class MainWindow {
 		leds[6] = led_6;
 		leds[7] = led_7;
 
-		JScrollBar adcPoti = new JScrollBar();
+		adcPoti = new JScrollBar();
 		adcPoti.setBounds(102, 12, 17, 233);
 		frame.getContentPane().add(adcPoti);
 
-		JScrollBar adcLight = new JScrollBar();
+		adcLight = new JScrollBar();
 		adcLight.setBounds(142, 12, 17, 233);
 		frame.getContentPane().add(adcLight);
 
 		JButton btnLoad = new JButton("Load");
 		this.btnLoad = btnLoad;
-		btnLoad.setBounds(266, 14, 117, 25);
+		btnLoad.setBounds(171, 66, 117, 25);
 		frame.getContentPane().add(btnLoad);
 		
 		JButton btnStop = new JButton("Stop");
 		this.btnStop = btnStop;
-		btnStop.setBounds(266, 61, 117, 25);
+		btnStop.setBounds(171, 103, 117, 25);
 		frame.getContentPane().add(btnStop);
 		
 		Canvas canvas = new Canvas();
 		canvas.setBackground(Color.BLACK);
 		canvas.setBounds(243, 137, 164, 102);
 		frame.getContentPane().add(canvas);
+		
+		btnT1 = new JButton("T1");
+		btnT1.setBounds(294, 14, 50, 25);
+		frame.getContentPane().add(btnT1);
+		
+		btnT2 = new JButton("T2");
+		btnT2.setBounds(356, 14, 50, 25);
+		frame.getContentPane().add(btnT2);
 		
 		frame.setVisible(true);
 	}
