@@ -6,9 +6,10 @@ import java.awt.Frame;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollBar;
-
+import javax.swing.JSlider;
 
 import eu.hansolo.steelseries.tools.LedColor;
+
 import java.awt.Canvas;
 
 public class MainWindow {
@@ -20,8 +21,8 @@ public class MainWindow {
 	public JButton btnLoad;
 	public JButton btnStop;
 	
-	public JScrollBar adcPoti;
-	public JScrollBar adcLight;
+	public JSlider adcPoti;
+	public JSlider adcLight;
 	public JButton btnT2;
 	public JButton btnT1;
 	
@@ -104,12 +105,14 @@ public class MainWindow {
 		leds[6] = led_6;
 		leds[7] = led_7;
 
-		adcPoti = new JScrollBar();
+		adcPoti = new JSlider();
 		adcPoti.setBounds(102, 12, 17, 233);
+		adcPoti.setOrientation(JSlider.VERTICAL);
 		frame.getContentPane().add(adcPoti);
 
-		adcLight = new JScrollBar();
+		adcLight = new JSlider();
 		adcLight.setBounds(142, 12, 17, 233);
+		adcLight.setOrientation(JSlider.VERTICAL);
 		frame.getContentPane().add(adcLight);
 
 		JButton btnLoad = new JButton("Load");

@@ -23,10 +23,11 @@ import scala.collection.mutable.SynchronizedQueue
 import javax.swing.JButton
 import avrora.sim.mcu.ADC
 import avrora.sim.mcu.AtmelMicrocontroller
+import javax.swing.JSlider
 
 
 
-class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg], adc:Array[Adjustable], pins:Array[JButton]) {
+class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg], adc:Array[JSlider], pins:Array[JButton]) {
 
 	var freq  = 1 * 1000 * 1000 // 1 MHz
 	var isrunning = false
