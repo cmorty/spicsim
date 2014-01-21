@@ -5,7 +5,7 @@ import avrora.sim.clock.MainClock
 
 class PwmLowPass (val clock:MainClock) {
 	
-	val range = (30 * clock.millisToCycles(1)).toInt // 100ms
+	val range = (10 * clock.millisToCycles(1)).toInt // 100ms
 	val bucktes =  100;
 	
 	val bucketsize = range / bucktes
