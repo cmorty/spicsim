@@ -1,23 +1,15 @@
 package de.fau.spicsim.dev
 
-import avrora.sim.Simulation
-import avrora.sim.clock.Synchronizer
-import java.io.File
-import avrora.core.LoadableProgram
-import avrora.sim.mcu.ATMega32
-import avrora.sim.platform.DefaultPlatform
-import cck.util.Options
-import scala.actors.threadpool.TimeUnit
-import avrora.sim.State
-import avrora.sim.Simulator
-import avrora.sim.mcu.Microcontroller
-import avrora.sim.AtmelInterpreter
-import cck.util.Arithmetic
-import de.fau.spicsim.gui.Led
-import avrora.sim.clock.MainClock
-import de.fau.spicsim.gui.SevenSeg
 import java.awt.Color
+
+import scala.Array.canBuildFrom
+
+import avrora.sim.AtmelInterpreter
+import avrora.sim.Simulator
+import avrora.sim.State
+import cck.util.Arithmetic
 import de.fau.spicsim.PwmLowPass
+import de.fau.spicsim.gui.SevenSeg
 
 class SevenSegDev(sim: Simulator, sSegs: Array[de.fau.spicsim.gui.SevenSeg]) extends Simulator.Watch.Empty {
 	//Config
@@ -103,8 +95,8 @@ class SevenSegDev(sim: Simulator, sSegs: Array[de.fau.spicsim.gui.SevenSeg]) ext
 	val segc = sSegs.map(new SegControl(_))
 	
 
-	def getport(port: String) = interp.getRegisterByte(mcu.getProperties.getIORegAddr(port))
-	def regWatch(port: String) = sim.insertWatch(this, mcu.getProperties.getIORegAddr(port))
+	private def getport(port: String) = interp.getRegisterByte(mcu.getProperties.getIORegAddr(port))
+	private def regWatch(port: String) = sim.insertWatch(this, mcu.getProperties.getIORegAddr(port))
 
 	regWatch("PORTD")
 	regWatch("PORTB")
