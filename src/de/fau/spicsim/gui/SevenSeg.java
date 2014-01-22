@@ -15,16 +15,15 @@ package de.fau.spicsim.gui;
 
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.LayoutManager;
 import java.awt.geom.*;
 
-import javax.swing.JPanel;
 
 
-public class SevenSeg extends JPanel {
+public class SevenSeg extends Component {
 	
 	private static final long serialVersionUID = 7364720260424088546L;
 
@@ -43,23 +42,6 @@ public class SevenSeg extends JPanel {
 		init();
 	}
 
-	public SevenSeg(boolean isDoubleBuffered)
-	{
-		super(isDoubleBuffered);
-		init();
-	}
-
-	public SevenSeg(LayoutManager layout, boolean isDoubleBuffered)
-	{
-		super(layout, isDoubleBuffered);
-		init();
-	}
-
-	public SevenSeg(LayoutManager layout)
-	{
-		super(layout);
-		init();
-	}
 
 	private void init()
 	{
@@ -140,17 +122,16 @@ public class SevenSeg extends JPanel {
 	
 
 	@Override
-	public void paintComponent(Graphics gr)
+	public void paint(Graphics gr)
 	{
-		super.paintComponent(gr);
-		Graphics2D g = (Graphics2D) gr;		
+		Graphics2D g = (Graphics2D) gr;
+		g.setBackground(Color.black);
+		g.clearRect(0, 0, getWidth(), getHeight());
 		
 		for(int i=0 ; i<segment.length ; i++)
 		{
 			paintSegment(g, i, segment[i]);
 		}
-		
-
 	}
 	
 	private void paintSegment(Graphics2D g, int segment, Color col)

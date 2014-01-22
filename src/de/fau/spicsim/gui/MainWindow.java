@@ -5,7 +5,6 @@ import java.awt.Frame;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JScrollBar;
 import javax.swing.JSlider;
 
 import eu.hansolo.steelseries.tools.LedColor;
@@ -40,12 +39,12 @@ public class MainWindow {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		SevenSeg sSeg0 = new SevenSeg(true);
+		SevenSeg sSeg0 = new SevenSeg();
 		sSeg0.setBackground(Color.BLACK);
 		sSeg0.setBounds(266, 158, 46, 58);
 		
 
-		SevenSeg sSeg1 = new SevenSeg(true);
+		SevenSeg sSeg1 = new SevenSeg();
 		sSeg1.setBackground(Color.BLACK);
 		sSeg1.setBounds(324, 158, 46, 58);
 		
