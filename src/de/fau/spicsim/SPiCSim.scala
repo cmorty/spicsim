@@ -7,7 +7,6 @@ import avrora.core.LoadableProgram
 import avrora.sim.mcu.ATMega32
 import avrora.sim.platform.DefaultPlatform
 import cck.util.Options
-import scala.actors.threadpool.TimeUnit
 import avrora.sim.State
 import avrora.sim.Simulator
 import avrora.sim.mcu.Microcontroller
@@ -59,6 +58,7 @@ class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg
 	val ledwatch = new LedDev(sim, leds)
 	
 	val segwatch = new dev.SevenSegDev(sim, sSeg)
+	
 	
 	val adcdev = new dev.AdcDev(sim,adc)
 	

@@ -7,7 +7,6 @@ import avrora.core.LoadableProgram
 import avrora.sim.mcu.ATMega32
 import avrora.sim.platform.DefaultPlatform
 import cck.util.Options
-import scala.actors.threadpool.TimeUnit
 import avrora.sim.State
 import avrora.sim.Simulator
 import avrora.sim.mcu.Microcontroller
