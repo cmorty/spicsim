@@ -43,33 +43,32 @@ class SevenSegDev(sim: Simulator, sSegs: Array[de.fau.spicsim.gui.SevenSeg]) ext
 
 		val segStates = Array.fill(7)(new SegState)
 		
-		
 		update
 		
-
-
 		/**
 		 * Update colors
 		 * @return Whether there elements in flux
 		 */
-		private def update() = {
-			var rv = false
+		private def update() {
+			
 			for (seg <- 0 to 6) yield {
 				val segS = segStates(seg)
 				val newl = segS.getlevel
 				
+				
 				var fac = newl * 2;
-				if(fac > 1) fac = 1
-				if(fac < 0.2) fac = 0;
+				if(fac > 0.9) fac = 1
+				if(fac < 0.1) fac = 0;
+				
+				
 				val nCol = new Color((onCol.getRed * fac).toInt, (onCol.getGreen * fac).toInt, (onCol.getBlue * fac).toInt, onCol.getAlpha)
 				
 				if (!nCol.equals(segS.lastlevelCol)) {
 					segS.lastlevelCol = nCol
 					sSeg.setSegment(segMap(seg), nCol)
-					if (newl != 1 && newl != 0) rv = true
 				}
+				
 			}
-			rv
 		}
 
 		var queued = false
@@ -83,7 +82,8 @@ class SevenSegDev(sim: Simulator, sSegs: Array[de.fau.spicsim.gui.SevenSeg]) ext
 		}
 
 		def fire {
-			if (update) { //Stuff in flux - need to reschedule
+			update
+			if (segStates.exists(_.flux)) { //Stuff in flux - need to reschedule
 				clock.insertEvent(this, clock.millisToCycles(res))
 			} else {
 				queued = false
