@@ -5,23 +5,23 @@ import avrora.sim.clock.MainClock
 
 class PwmLowPass (val clock:MainClock) {
 	
-	val range = (10 * clock.millisToCycles(1)).toInt // 100ms
+	val range = (20 * clock.millisToCycles(1)).toInt // 100ms
 	val bucktes =  100;
 	
 	val bucketsize = range / bucktes
 	
-	var debugthis = false
+	
 
 	class OnOffAcc (){
 		var on = 0
-		var off = bucketsize //Closures rule!
+		var off = 0 //Closures rule!
 		
 		def emptyFill (amount:Int, fillOn:Boolean){
 			if(fillOn){
-				on += amount
+				on = amount
 				off = 0
 			} else {
-				off += amount
+				off = amount
 				on = 0
 			}
 		}
@@ -38,17 +38,23 @@ class PwmLowPass (val clock:MainClock) {
 	
 	val buckets = Array.fill(bucktes)(new OnOffAcc())
 	
-	var lastwrite:Long = 0
-	var curlevel:Boolean = false
-	var lastlevel:Boolean = false
+	private var lastwrite:Long = 0
+	private var curlevel:Boolean = false
+	private var lastlevel:Boolean = false
 	var flux = false
 	
-	private def update(doupdate:Boolean) {
+	private def update(doupdate:Boolean){this.synchronized {
 		
-		var dthis = debugthis
+		
+		val tm = clock.getCount 
+		val startbuck = ((tm % range) / bucketsize).toInt //Get current element
+		var maxfill = ((tm % range) % bucketsize).toInt
+		
 		
 		if(!flux){
 			if(curlevel == lastlevel) return // Nothing to do
+			
+			buckets(startbuck).emptyFill(maxfill, lastlevel)
 			lastwrite = clock.getCount
 			lastlevel = curlevel
 			flux = true
@@ -61,50 +67,59 @@ class PwmLowPass (val clock:MainClock) {
 			return //Nothing changed an no need to update
 		}
 
-		val tm = clock.getCount 
+		
 		
 		var dtime = (tm - lastwrite).toInt //How much time is there to fill buckets
+		val ddtime = (tm - lastwrite).toInt //How much time is there to fill buckets
 
-		if(dtime > range){
-			dtime = range //Only range time
-			flux = false;
-		} 
-		
-		var curbuck = ((tm % range) / bucketsize).toInt //Get current element
-		var maxfill = ((tm % range) % bucketsize).toInt
 		
 		
-		while(dtime >= maxfill){
-			buckets(curbuck).emptyFill(maxfill, lastlevel)
+		
+		var curbuck = startbuck
+
+		var stop = false
+		while(dtime >= 0 && !stop){
+			if(dtime > maxfill) {
+				buckets(curbuck).emptyFill(maxfill, lastlevel)
+			} else {
+				buckets(curbuck).fill(dtime, lastlevel)
+			}
 			dtime -= maxfill
-			maxfill = bucketsize // next bucket can be fill more
+			maxfill = bucketsize // next bucket can be fully filled
 			curbuck -= 1
 			if(curbuck < 0) curbuck = bucktes -1
+			if(curbuck == startbuck) stop == true
+			
 		}
 		
 		//Fill rest
-		buckets(curbuck).fill(dtime, lastlevel)
+		
+		if(buckets.exists(b => {b.on + b.off > bucketsize + 1})) throw new Exception("Overfull bucket")
+		
+		
+		
+		
 		
 		lastwrite = tm
 		lastlevel = curlevel
-		
-	}
+	}}
 	
 	
 	
 	def setLevel(level:Boolean) = {
-		if(curlevel == level){
-			false
-		} else { 
-			curlevel = level
-			update(false)
-			true
+		this.synchronized {
+			if(curlevel == level){
+				false
+			} else { 
+				curlevel = level
+				update(false)
+				true
+			}
 		}
 	}
 	
 	def getlevel:Float = {
 		
-		var dthis = debugthis
 		
 		if(!flux){
 			return if(curlevel) 1 else 0 
@@ -114,13 +129,17 @@ class PwmLowPass (val clock:MainClock) {
 		
 		var on = 0
 		var off = 0
-		buckets.foreach(x => {on += x.on; off += x.off}) //Aggregate
+		this.synchronized {
+			buckets.foreach(x => {on += x.on; off += x.off}) //Aggregate
+			
+			if((off == 0 && curlevel) || (on == 0 && !curlevel)) flux = false
 		
-		if((off == 0 && curlevel) || (on == 0 && !curlevel)) flux = false
-		
+		}
 		val rv = on.toFloat / (on + off)
 		
 		rv
 	}
 	
 }
+
+
