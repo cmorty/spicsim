@@ -36,7 +36,7 @@ class PwmLowPass (val clock:MainClock) {
 		}
 	}	
 	
-	val buckets = Array.fill(bucktes)(new OnOffAcc())
+	val buckets = List.fill(bucktes)(new OnOffAcc())
 	
 	private var lastwrite:Long = 0
 	private var curlevel:Boolean = false
