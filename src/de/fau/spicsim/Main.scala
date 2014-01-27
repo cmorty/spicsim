@@ -14,14 +14,13 @@ object Main {
 	var lastpath = "."
 	lastpath = "/home/inf4/morty/Lehre/V_SPIC/uebungen/spicboard/boardtest"
 	lastpath = "testcode"
+		lastpath = "."
 	
 	var sim:SPiCSim = null;
 	
 	def main(args: Array[String]): Unit = {
 		initGui
-		
-		
-		
+
 	}
 	
 	
@@ -45,7 +44,10 @@ object Main {
 	def openFile(){
 		val chooser = new JFileChooser(lastpath);
 		if(chooser.showOpenDialog(gui.getFrame) !=  JFileChooser.APPROVE_OPTION) return;
-		sim = new SPiCSim(chooser.getSelectedFile,gui.leds, gui.sSeg.reverse, Array(gui.adcLight, gui.adcPoti), Array(gui.btnT1, gui.btnT2))
+		lastpath = chooser.getSelectedFile.getParentFile.toString
+		
+		if(sim != null) sim.stop
+		sim = new SPiCSim(chooser.getSelectedFile,gui.leds.reverse, gui.sSeg.reverse, Array(gui.adcLight, gui.adcPoti), Array(gui.btnT1, gui.btnT2))
 		sim.start
 	}
 

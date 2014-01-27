@@ -58,39 +58,40 @@ public class MainWindow {
 		Led led_0 = new Led();
 		led_0.setLedColor(LedColor.BLUE);
 		led_0.setBounds(51, 217, 39, 39);
-		led_0.setCustomLedColor(Color.GREEN);
 		frame.getContentPane().add(led_0);
 
 		Led led_1 = new Led();
+		led_1.setLedColor(LedColor.GREEN);
 		led_1.setBounds(51, 180, 39, 39);
 		frame.getContentPane().add(led_1);
 
 		Led led_2 = new Led();
-		led_2.setLedColor(LedColor.YELLOW_LED);
+		led_2.setLedColor(LedColor.YELLOW);
 		led_2.setBounds(51, 151, 39, 39);
 		frame.getContentPane().add(led_2);
 
 		Led led_3 = new Led();
-		led_3.setLedColor(LedColor.GREEN_LED);
+		led_3.setLedColor(LedColor.RED);
 		led_3.setBounds(51, 121, 39, 39);
 		frame.getContentPane().add(led_3);
 
 		Led led_4 = new Led();
-		led_4.setLedColor(LedColor.BLUE_LED);
+		led_4.setLedColor(LedColor.BLUE);
 		led_4.setBounds(51, 89, 39, 39);
 		frame.getContentPane().add(led_4);
 
 		Led led_5 = new Led();
+		led_5.setLedColor(LedColor.GREEN);
 		led_5.setBounds(51, 61, 39, 39);
 		frame.getContentPane().add(led_5);
 
 		Led led_6 = new Led();
-		led_6.setLedColor(LedColor.YELLOW_LED);
+		led_6.setLedColor(LedColor.YELLOW);
 		led_6.setBounds(51, 33, 39, 39);
 		frame.getContentPane().add(led_6);
 
 		Led led_7 = new Led();
-		led_7.setLedColor(LedColor.GREEN_LED);
+		led_7.setLedColor(LedColor.RED);
 		led_7.setBounds(51, 0, 39, 39);
 		frame.getContentPane().add(led_7);
 		

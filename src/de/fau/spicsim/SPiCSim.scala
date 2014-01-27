@@ -120,11 +120,6 @@ class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg
 		}
 	}
 
-
-	
-	
-	
-	 
 }
 
 
