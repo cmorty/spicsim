@@ -111,7 +111,7 @@ class SevenSegDev(sim: Simulator, sSegs: Array[de.fau.spicsim.gui.SevenSeg]) ext
 		val ddrb = getport("DDRB")
 
 		for (sSegId <- 0 to 1) {
-			if (bs(portd, sSegId) && bs(ddrd, sSegId)) { //Output & High
+			if (! (bs(portd, sSegId) && bs(ddrd, sSegId))) { //Output & High
 				for (seg <- 0 to 6) {
 					setSeg(sSegId, seg, bs(ddrb, seg) && !bs(portb, seg))
 				}

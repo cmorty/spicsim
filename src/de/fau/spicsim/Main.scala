@@ -47,7 +47,7 @@ object Main {
 		lastpath = chooser.getSelectedFile.getParentFile.toString
 		
 		if(sim != null) sim.stop
-		sim = new SPiCSim(chooser.getSelectedFile,gui.leds.reverse, gui.sSeg.reverse, Array(gui.adcLight, gui.adcPoti), Array(gui.btnT1, gui.btnT2))
+		sim = new SPiCSim(chooser.getSelectedFile,gui.leds.reverse, gui.sSeg, Array(gui.adcLight, gui.adcPoti), Array(gui.btnT1, gui.btnT2))
 		sim.start
 	}
 
