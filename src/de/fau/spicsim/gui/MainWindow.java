@@ -18,7 +18,7 @@ public class MainWindow {
 	public SevenSeg sSeg[] = new SevenSeg[2];
 	public Led leds[] = new Led[8];
 	public JButton btnLoad;
-	public JButton btnStop;
+	public JButton btnStack;
 	
 	public JSlider adcPoti;
 	public JSlider adcLight;
@@ -120,10 +120,10 @@ public class MainWindow {
 		btnLoad.setBounds(171, 66, 117, 25);
 		frame.getContentPane().add(btnLoad);
 		
-		JButton btnStop = new JButton("Stop");
-		this.btnStop = btnStop;
-		btnStop.setBounds(171, 103, 117, 25);
-		frame.getContentPane().add(btnStop);
+		JButton btnStack = new JButton("StackMon");
+		this.btnStack = btnStack;
+		btnStack.setBounds(171, 103, 117, 25);
+		frame.getContentPane().add(btnStack);
 		
 		Canvas canvas = new Canvas();
 		canvas.setBackground(Color.BLACK);

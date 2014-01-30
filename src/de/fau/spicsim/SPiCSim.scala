@@ -23,6 +23,8 @@ import javax.swing.JButton
 import avrora.sim.mcu.ADC
 import avrora.sim.mcu.AtmelMicrocontroller
 import javax.swing.JSlider
+import de.fau.spicsim.gui.StackPanel
+import de.fau.spicsim.dev.StackMon
 
 
 
@@ -79,10 +81,13 @@ class SPiCSim(file:File, leds:Array[Led], sSeg:Array[de.fau.spicsim.gui.SevenSeg
 		}
 	}
 
+	def addStackmon(pan:StackPanel){
+		val smon = new StackMon(sim, pan)
+	}
+	
+	
 	
 	class SPiCSimThread extends Thread{
-		
-		
 		
 		override
 		def run(){
