@@ -136,13 +136,20 @@
 							public static void main(java.lang.String[]);
 							}</option>
 						
+						<!-- Scala warnings must be ignored -->
 						<option>-dontwarn scala.**</option>
-						<option>-dontwarn com.jidesoft.plaf.aqua.**</option>
-						<option>-dontwarn org.apache.avalon.framework.**</option>
-						<option>-dontwarn  com.sun.image.codec.jpeg.**</option>
+						
+						<!-- We don't use log4j for now -->
 						<option>-dontwarn  org.apache.log4j.**</option>
 						<option>-dontwarn  org.apache.log.**</option>
-						<option>-dontwarn  com.jidesoft.**</option>
+						
+						<!-- No nice GUIs -->
+						<option>-dontwarn com.jidesoft.plaf.aqua.**</option>
+						<option>-dontwarn org.apache.avalon.framework.**</option>
+						
+						<!-- Seems like this can be ignored, too as we don't export anything -->
+						<option>-dontwarn  com.sun.image.codec.jpeg.**</option>
+
 						
 						
 					</options>
