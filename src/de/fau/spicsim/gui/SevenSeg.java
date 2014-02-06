@@ -30,7 +30,7 @@ public class SevenSeg extends Component {
 	public static final float MIN_WIDTH = 12, MIN_HEIGHT = 20;
 	
 	
-	private Color[] segment = {null, null, null, null, null, null, null};
+	private Color[] segment = {Color.gray, Color.gray, Color.gray,Color.gray, Color.gray, Color.gray, Color.gray};
 	
 	private boolean paintSegmentBorder = true;
 	private Color borderColor = Color.GRAY;
@@ -95,27 +95,24 @@ public class SevenSeg extends Component {
 	/** schaltet ein einzelnes Segment (0-6) ein oder aus
 	 * 
 	 * @param segment  das Segment das geschaltet werden soll
-	 * @param state  true schaltet das Segment ein, false aus.
+	 * @param col  true schaltet das Segment ein, false aus.
 	 */	 
-	public void setSegment(int segment, Color state)
+	public void setSegment(int segment, Color col)
 	{
-		if(segment < 0) segment = 0;
-		else if(segment > 6) segment = 6;
-		
-		this.segment[segment] = state;
-		
+		if(this.segment[segment].equals(col)) return;
+		this.segment[segment] = col;
 		repaint();
 	}
 	
 	/** schaltet alle 7 Segmente an oder aus.
 	 * 
-	 * @param state  true schaltet die Segmente ein, false aus.
+	 * @param col  true schaltet die Segmente ein, false aus.
 	 */
-	public void setAllSegments(Color state)
+	public void setAllSegments(Color col)
 	{
 		for (int i=0 ; i<7 ; i++)
 		{
-			segment[i] = state;
+			setSegment(i, col);
 		}
 		repaint();
 	}

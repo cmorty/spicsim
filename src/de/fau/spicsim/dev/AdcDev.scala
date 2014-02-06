@@ -1,6 +1,5 @@
 package de.fau.spicsim.dev
 
-import de.fau.spicsim.gui.Led
 import avrora.sim.Simulator
 import avrora.sim.AtmelInterpreter
 import avrora.sim.mcu.AtmelMicrocontroller
@@ -8,19 +7,44 @@ import avrora.sim.mcu.ADC
 import avrora.sim.mcu.ADC.ADCInput
 import java.awt.Adjustable
 import javax.swing.JSlider
+import de.fau.spicsim.interfaces.AdcInterface
+import de.fau.spicsim.interfaces.SpicSimDev
+import de.fau.spicsim.interfaces.SpicSimDevUpdater
 
-class AdcDev(sim: Simulator, inputs:Array[JSlider]) {
-	val mcu = sim.getMicrocontroller.asInstanceOf[AtmelMicrocontroller]
-	val interp = sim.getInterpreter.asInstanceOf[AtmelInterpreter]
-	val clock = sim.getClock
-	
-	val adcdev = mcu.getDevice("adc").asInstanceOf[ADC]
-	
-	class Adc(i:JSlider) extends ADCInput {
-		def getVoltage:Float = (i.getValue / i.getMaximum.toFloat) * 5
+class AdcDev(ssdu: SpicSimDevUpdater) extends SpicSimDev(ssdu) {
+
+	var refvolt: Float = 5
+
+	class Adc() extends ADCInput with AdcInterface with DevObservable {
+		private var volt: Float = refvolt / 2
+
+		def getVoltage: Float = volt
+
+		def setVoltage(v: Float) {
+			if (volt != v) {
+				volt = v
+				updateAndNotify
+			}
+		}
+
+		def setLevel(level: Int) {
+			setVoltage(refvolt * level / 1024)
+		}
+
+		def getLevel = (volt * 1024 / refvolt).toInt
+
 	}
-	
-	adcdev.connectADCInput(new Adc(inputs(0)),0)
-	adcdev.connectADCInput(new Adc(inputs(1)),1)
+
+	val adcs = List.fill(2)(new Adc)
+
+	override def registerSim(sim: Simulator) {
+		super.registerSim(sim)
+		val adcdev = mcu.getDevice("adc").asInstanceOf[ADC]
+		refvolt = adcdev.getVoltageRef
+		adcdev.connectADCInput(adcs(0), 0)
+		adcdev.connectADCInput(adcs(1), 1)
+	}
+
+	def adc(sel: Int) = adcs(sel)
 
 }

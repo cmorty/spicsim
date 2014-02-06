@@ -1,63 +1,50 @@
 package de.fau.spicsim.dev
 
-import avrora.sim.Simulation
-import avrora.sim.clock.Synchronizer
-import java.io.File
-import avrora.core.LoadableProgram
-import avrora.sim.mcu.ATMega32
-import avrora.sim.platform.DefaultPlatform
-import cck.util.Options
-import avrora.sim.State
+import scala.collection.mutable.Buffer
 import avrora.sim.Simulator
-import avrora.sim.mcu.Microcontroller
-import avrora.sim.AtmelInterpreter
-import cck.util.Arithmetic
+import avrora.sim.State
 import avrora.sim.clock.MainClock
-import de.fau.spicsim.gui.SevenSeg
-import java.awt.Color
-import de.fau.spicsim.gui.Led
-import de.fau.spicsim.PwmLowPass
+import cck.util.Arithmetic
+import de.fau.spicsim.interfaces.SpicSimDev
+import de.fau.spicsim.interfaces.LedInterface
+import de.fau.spicsim.interfaces.SpicSimDevUpdater
 
-class LedDev(sim: Simulator, leds:Array[Led]) extends Simulator.Watch.Empty {
-	val mcu = sim.getMicrocontroller
+case class LedDev(ssdu: SpicSimDevUpdater) extends SpicSimDev(ssdu) {
 
-	val interp = sim.getInterpreter.asInstanceOf[AtmelInterpreter]
+	class LED(ssdu: SpicSimDevUpdater, pin: String) extends PwmMon(ssdu) with DevObservable {
+		var pinOffset: Byte = -1
 
-	val clock = sim.getClock
+		var ddrAddr = -1
+		var portAddr = -1
 
-	private def bs(reg: Byte, bit: Int) = Arithmetic.getBit(reg, bit)
+		val sMon = new Simulator.Watch.Empty {
+			private def bs(reg: Byte, bit: Int) = Arithmetic.getBit(reg, bit)
 
-	class LEDControl(val id: Int, val port: Int, val ddr: Int, val bit: Int) extends PwmLowPass(clock) {
-		
-	}
+			override def fireAfterWrite(state: State, data_addr: Int, value: Byte) {
+				val ddr = interp.getRegisterByte(ddrAddr)
+				val port = interp.getRegisterByte(portAddr)
+				val ddrl = bs(ddr, pinOffset)
+				val portl = bs(port, pinOffset)
 
-	val ledlist = List("D7", "C0", "C1", "C6", "C7", "A7", "A6", "A5")
-
-	val ledmap = {
-		var el = 0;
-		for (dat <- ledlist) yield {
-			val port = mcu.getProperties.getIORegAddr("PORT" + dat(0))
-			val ddr = mcu.getProperties.getIORegAddr("DDR" + dat(0))
-			val led = new LEDControl(el, port, ddr, dat(1).toString.toByte)
-			el += 1
-			led
+				if (setLevel(ddrl && !portl)) {
+					updateAndNotify()
+				}
+			}
 		}
-	}
 
-	for (ior <- ledmap.flatMap(x => { List(x.port, x.ddr) }).distinct) yield {
-		sim.insertWatch(LedDev.this, ior);
-	}
-
-	override def fireAfterWrite(state: State, data_addr: Int, value: Byte) {
-
-		for (led <- ledmap) yield if (led.ddr == data_addr || led.port == data_addr) {
-
-			val ddr = interp.getRegisterByte(led.ddr)
-			val port = interp.getRegisterByte(led.port)
-			val ddrl = bs(ddr, led.bit)
-			val portl = bs(port, led.bit)
-
-			leds(led.id).setLedOn(ddrl && !portl)
+		override def registerSim(sim: Simulator) {
+			super.registerSim(sim)
+			portAddr = mcu.getProperties.getIORegAddr("PORT" + pin(0))
+			ddrAddr = mcu.getProperties.getIORegAddr("DDR" + pin(0))
+			sim.insertWatch(sMon, portAddr);
+			sim.insertWatch(sMon, ddrAddr);
+			pinOffset = pin(1).toString.toByte
 		}
+
 	}
+
+	private val ledlist = List("D7", "C0", "C1", "C6", "C7", "A7", "A6", "A5")
+
+	val leds = ledlist.map(x => new LED(this, x))
+
 }

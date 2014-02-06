@@ -17,71 +17,59 @@ import java.util.Observable
 import javax.swing.JButton
 import javax.swing.event.ChangeListener
 import javax.swing.event.ChangeEvent
-import de.fau.spicsim.SPiCSim
+import de.fau.spicsim.SpicSim
+import de.fau.spicsim.interfaces.PinInterface
+import de.fau.spicsim.interfaces.SpicSimDev
+import de.fau.spicsim.interfaces.PinTristate
+import de.fau.spicsim.interfaces.SpicSimDevUpdater
 
+class PinDev(ssdu: SpicSimDevUpdater) extends SpicSimDev(ssdu) {
 
-class PinDev(ssim: SPiCSim, sim: Simulator, inputs:Array[JButton])  {
-	
-	object Tristate extends Enumeration {
-		type WeekDay = Value
-		val High, Low, HighZ = Value
-	}
-	
-	
-	
-	
-	val mcu = sim.getMicrocontroller.asInstanceOf[ATMegaFamily]
-	val interp = sim.getInterpreter.asInstanceOf[AtmelInterpreter]
-	val clock = sim.getClock
-	
-	
-	class PinControl (_port:Char,  pin:Int, iscoff:Int, gicroff:Int, int:Int) extends Simulator.Watch.Empty with Simulator.Event with Microcontroller.Pin.Input {
-		
+	class PinControl(_port: Char, pin: Int, iscoff: Int, gicroff: Int, int: Int) extends Simulator.Watch.Empty with Simulator.Event with Microcontroller.Pin.Input with PinInterface {
+
 		private def bs(reg: Byte, bit: Int) = Arithmetic.getBit(reg, bit)
 		private def getport(port: String) = interp.getRegisterByte(mcu.getProperties.getIORegAddr(port))
 		private def regWatch(port: String) = sim.insertWatch(this, mcu.getProperties.getIORegAddr(port))
-		
-		
-		var extState = Tristate.HighZ
+
+		var extState = PinTristate.HighZ
 		private var curlevel = false
-	
-		regWatch("MCUCR")
-		regWatch("GICR")
-		regWatch("DDR" + _port)
-		regWatch("PORT" + _port)
-		
-		//Register self
-		mcu.getPin("P" + _port + pin).connectInput(this);
-			
-			
-		override def fire(){
-			
-			
+
+		def updateSim() {
+			regWatch("MCUCR")
+			regWatch("GICR")
+			regWatch("DDR" + _port)
+			regWatch("PORT" + _port)
+
+			//Register self
+			mcu.getPin("P" + _port + pin).connectInput(this);
+			shedule
+		}
+
+		override def fire() {
+
 			val rPort = getport("PORTD")
 			val rDdr = getport("DDRD")
-			val mcucr =  getport("MCUCR")
-			val gicr =  getport("GICR")
-			
+			val mcucr = getport("MCUCR")
+			val gicr = getport("GICR")
 
 			val dir = bs(rDdr, pin)
 			val port = bs(rPort, pin)
-			
-			val level:Boolean = {
-				if(extState != Tristate.HighZ){ //Input is not HighZ
-					extState == Tristate.High
+
+			val level: Boolean = {
+				if (extState != PinTristate.HighZ) { //Input is not HighZ
+					extState == PinTristate.High
 				} else { //Input - HighZ
-					if(!dir && !port){ // Output is HighZ, too
+					if (!dir && !port) { // Output is HighZ, too
 						curlevel //HighZ -> No change
 					} else {
 						port //Otherwise output or Pullup
 					}
 				}
 			}
-			
-			
-			if(bs(gicr, gicroff)) {//Interupt activated
+
+			if (bs(gicr, gicroff)) { //Interupt activated
 				//Calculate level at output
-				val sInt:Boolean = (bs(mcucr, iscoff + 1),bs(mcucr, iscoff + 0)) match { 
+				val sInt: Boolean = (bs(mcucr, iscoff + 1), bs(mcucr, iscoff + 0)) match {
 					case (false, false) => //Low
 						!level
 					case (false, true) => //Both
@@ -90,75 +78,47 @@ class PinDev(ssim: SPiCSim, sim: Simulator, inputs:Array[JButton])  {
 						curlevel && !level
 					case (true, true) => //Rising
 						!curlevel && level
-				}	
-				
-				
-				if(sInt){
+				}
+
+				if (sInt) {
 					val flag = mcu.getEIFR_reg();
 					flag.flagBit(int);
 				}
 			}
 			curlevel = level
 		}
-		
-		
-		private def shedule {
-			if(!ssim.evq.contains(this)){ 
-				ssim.evq += (this -> 0)
-			}
 
+		private def shedule {
+			if (clock != null) clock.insertEvent(this, 0)
 		}
-		
-		def setInput(in:Tristate.Value){
-			if(extState != in){
+
+		def setInput(in: PinTristate) {
+			if (extState != in) {
 				extState = in
 				shedule
 			}
 		}
-		
+
 		override def fireAfterWrite(state: State, data_addr: Int, value: Byte) {
 			shedule
 		}
-		
-		def read:Boolean = curlevel
-		
+
+		def read: Boolean = curlevel
+
 	}
-	
-	
 
-	
-	val pinc = Array(
-		new PinControl('D',2, 0, 6,6),
-		new PinControl('D',3, 2, 7, 7)
+	private val pinc = List(
+		new PinControl('D', 2, 0, 6, 6),
+		new PinControl('D', 3, 2, 7, 7)
 	)
-	
-	pinc.foreach(_.setInput(Tristate.High))
 
-	
-	
-	class Inputmon(jb: JButton, pc: PinControl) {
-	
-		val bModel = jb.getModel
-	
-		val cl = new ChangeListener {
-			def stateChanged(cEvt: ChangeEvent) {
-				if (bModel.isPressed()) {
-					pc.setInput(Tristate.Low)
-				} else if (!bModel.isPressed()) {
-					pc.setInput(Tristate.HighZ)
-				}
+	pinc.foreach(_.setInput(PinTristate.High))
 
-			}
-		}
-		
-		jb.addChangeListener(cl)
+	override def registerSim(sim: Simulator) {
+		super.registerSim(sim)
+		pinc.foreach(_.updateSim)
 	}
-	
-	
-	val imon = Array(
-		new Inputmon(inputs(0), pinc(0)),
-		new Inputmon(inputs(1), pinc(1))
-	)
-	
-	
+
+	def pin(id: Int) = pinc(id).asInstanceOf[PinInterface]
+
 }
