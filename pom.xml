@@ -44,14 +44,14 @@
 
 
 		<plugins>
-<plugin>
-		<artifactId>maven-compiler-plugin</artifactId>
-		<version>2.3.2</version>
-		<configuration>
-			<source>1.6</source>
-			<target>1.6</target>
-		</configuration>
-	</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>scala-maven-plugin</artifactId>
@@ -61,7 +61,7 @@
 						<id>compile</id>
 						<goals>
 							<goal>compile</goal>
-							 <goal>testCompile</goal>
+							<goal>testCompile</goal>
 						</goals>
 						<phase>compile</phase>
 					</execution>
@@ -70,6 +70,12 @@
 					<scalaVersion>2.11.0</scalaVersion>
 					<recompileMode>incremental</recompileMode>
 					<useZincServer>true</useZincServer>
+					<args>
+						<arg>-unchecked</arg>
+						<arg>-deprecation</arg>
+						<arg>-explaintypes</arg>
+						<arg>-feature</arg>
+					</args>
 				</configuration>
 
 			</plugin>
