@@ -137,7 +137,8 @@
 				<version>2.0.7</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<!-- <phase>package</phase> -->
+						<phase>none</phase>
 						<goals>
 							<goal>proguard</goal>
 						</goals>
@@ -148,7 +149,7 @@
 					<obfuscate>false</obfuscate>
 					<includeDependencyInjar>true</includeDependencyInjar>
 					<injar>${project.build.finalName}.jar</injar>
-					<outjar>${project.build.finalName}-small.jar</outjar>
+					<outjar>${project.build.finalName}-proguard.jar</outjar>
 					<outputDirectory>${project.build.directory}</outputDirectory>
 					<options>
 						<!-- see http://sourceforge.net/p/proguard/bugs/459/ -->
@@ -160,7 +161,7 @@
 							main(java.lang.String[]);
 							}</option>
 						<option>-keep public class scala.runtime.RichDouble**
-</option>
+						</option>
 						<!-- Scala warnings must be ignored -->
 						<option>-dontwarn scala.**</option>
 
