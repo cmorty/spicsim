@@ -2,13 +2,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.fau.</groupId>
 	<artifactId>SPiCSim</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	
 	<scm>
 		<connection>scm:git:https://github.com/cmorty/spicsim.git</connection>
 		<developerConnection>scm:git:file://${basedir}</developerConnection>
 		<url>https://github.com/cmorty/spicsim</url>
-		<tag>SPiCSim-1.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
 		<repository>
