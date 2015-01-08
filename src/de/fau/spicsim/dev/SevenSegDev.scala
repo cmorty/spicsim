@@ -31,7 +31,7 @@ class SevenSegDev(ssdu: SpicSimDevUpdater) extends SpicSimDev(ssdu) with DevObse
 	def notify(subject: Any, data: Any) {
 		updateAndNotify(data)
 	}
-
+	import scala.language.reflectiveCalls
 	val sMon = new Simulator.Watch.Empty {
 		
 		def getport(port: String) = interp.getRegisterByte(mcu.getProperties.getIORegAddr(port))
