@@ -12,35 +12,34 @@ import de.fau.spicsim.interfaces.SpicSimDev
  *
  */
 
-class DiscreteLowPass(plp:PWMLowPass, levels:Int, hyst:Int = 2, res:Int = 20) extends  SpicSimDev(plp) with  DevObservable with DevObserver{
+// levels must be val https://issues.scala-lang.org/browse/SI-4396
+class DiscreteLowPass(plp: PWMLowPass, val levels: Int, hyst: Int = 2, res: Int = 20) extends SpicSimDev(plp) with DevObservable with DevObserver {
 
 	def maxlevel = levels - 1
-	
-	if(hyst < 1){
+
+	if (hyst < 1) {
 		throw new IllegalArgumentException("Hysteresis must be grater 0")
 	}
-	
+
 	//Register at clock
-	
-	
+
 	private var _level = 0;
 	def level = _level
-	
+
+	/** The value at which the last event was fired*/
 	private var level_fire = 0
-	
-	
+
 	var queued = false
-	
+
 	plp.addObserver(this)
-	
-	
-	val sMon = new Simulator.Event{
+
+	val sMon = new Simulator.Event {
 		// Fired by timer
 		def fire {
-			if(queued) recalc 
-			
+			if (queued) recalc
+
 			if (plp.flux) { //Stuff in flux - need to reschedule
-				if(queued == true) {
+				if (queued == true) {
 					clock.insertEvent(this, clock.millisToCycles(res))
 				} else {
 					clock.insertEvent(this, clock.millisToCycles(res) - (clock.getCount % clock.millisToCycles(res)))
@@ -51,7 +50,7 @@ class DiscreteLowPass(plp:PWMLowPass, levels:Int, hyst:Int = 2, res:Int = 20) ex
 			}
 		}
 	}
-	
+
 	//Recalc current value
 	private def recalc {
 		val curlevel = Math.round(plp.level * maxlevel)
@@ -63,16 +62,15 @@ class DiscreteLowPass(plp:PWMLowPass, levels:Int, hyst:Int = 2, res:Int = 20) ex
 		_level = curlevel
 		notifyObservers(_level)
 	}
-	
-	def notify(subject:Any ,data:Any){
-		if(queued == false) sMon.fire
+
+	def notify(subject: Any, data: Any) {
+		if (queued == false) sMon.fire
 	}
 
-	override
-	def registerSim(sim:Simulator){
+	override def registerSim(sim: Simulator) {
 		super.registerSim(sim)
 		queued = false
 		sMon.fire
 	}
-	
+
 }
