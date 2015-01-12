@@ -66,5 +66,22 @@ class TextOutput(ssim: SpicSim, os: OutputStream) {
 	}
 	ledsMon.addObserver(ledsO)
 
+	val SsegMon = new Digital7SegElMons(ssim.segwatch.segc)
+	val segO = new DevObserver {
+		def notify(subject: Any, data: Any) {
+			data match {
+				case s: List[Char] =>
+					if (s.contains('?')) {
+						ps.println("7Seg: " + s.mkString(""))
+					} else {
+						ps.println("7Seg: " + s.mkString(""))
+					}
+				//ps.println(SsegMon.ssegs(0).values.mkString(",") + " - " + SsegMon.ssegs(1).values.mkString(","))
+				case _ => throw new Exception("Did not get expected data")
+			}
+		}
+	}
+	SsegMon.addObserver(segO)
+
 }
 

@@ -79,17 +79,20 @@ class DigitalLedsMon(val input: List[PwmMon]) extends SpicSimDev(input.head) wit
 class Digital7SegElMon(input: List[PwmMon]) extends DevObserver with DevObservable {
 	if (input.length != 7) throw new Exception("Wrong number of elements")
 
-	val dlps = input.map(x => new DiscreteLowPass(new PWMLowPass(x, 25), 8, 1, 20))
+	val dlps = input.map(x => new DiscreteLowPass(new PWMLowPass(x), 8, 1, 20))
 	dlps.foreach(_.addObserver(this))
 
 	import LedState._
-	val state = scala.collection.mutable.Map(dlps.map(_ -> Trans): _*)
+	val state = scala.collection.mutable.Map(dlps.map(_ -> Off): _*)
+
+	def values = dlps.map(state(_))
 
 	def lOn(dat: Int*) = {
-		dat.fold(0)(_ + 1 << _)
+		dat.fold(0)((a, b) => a + (1 << b))
 	}
 
-	var curVal = '#'
+	private var curVal = 'K'
+	def value = curVal
 
 	val decode = Map(
 		/*
@@ -108,19 +111,23 @@ class Digital7SegElMon(input: List[PwmMon]) extends DevObserver with DevObservab
 		lOn(0, 5, 4, 3, 2, 6) -> '6',
 		lOn(0, 1, 2) -> '7',
 		lOn(0, 1, 2, 3, 4, 5, 6) -> '8',
-		lOn(0, 5, 1, 6, 2) -> '9',
+		lOn(0, 5, 1, 6, 2, 3) -> '9',
 		lOn(4, 5, 0, 1, 6, 2) -> 'A',
-		lOn(0, 5, 4, 3, 2, 6) -> 'b',
+		lOn(5, 4, 3, 2, 6) -> 'b',
 		lOn(0, 5, 4, 3) -> 'C',
 		lOn(6, 4, 3, 2, 1) -> 'd',
 		lOn(0, 5, 6, 4, 3) -> 'E',
 		lOn(0, 5, 6, 4) -> 'F',
 		lOn(5, 4, 6, 1, 2) -> 'H',
+		lOn(0, 5, 1, 6, 2) -> 'g',
 		lOn(5, 4) -> 'I',
 		lOn(5, 4, 3) -> 'L',
+		lOn(2, 3, 4, 6) -> 'o',
 		lOn(6, 1, 0, 5, 4) -> 'P',
-		lOn(0, 5, 6, 2, 3) -> 'S',
-		lOn(5, 4, 3, 2, 1) -> 'U'
+		lOn(5, 4, 3, 2, 1) -> 'U',
+		lOn(5) -> '-',
+		lOn(3) -> '_',
+		lOn() -> ' '
 
 	)
 
@@ -128,8 +135,9 @@ class Digital7SegElMon(input: List[PwmMon]) extends DevObserver with DevObservab
 		if (!state.values.forall(_ != Trans)) {
 			'#'
 		} else {
-			val st = state.values.foldLeft(0)((a, b) => a + (b.id << 1))
-			decode.getOrElse(st, '?')
+			val st = values.foldRight(0)((a, b) => (b << 1) + a.id)
+			decode.getOrElse(st, { /* println("Could not find " + st); */ '?' })
+
 		}
 	}
 
@@ -138,8 +146,8 @@ class Digital7SegElMon(input: List[PwmMon]) extends DevObserver with DevObservab
 			case dlp: DiscreteLowPass =>
 				data match {
 					case x: Int => state(dlp) = {
-						if (x < 2) Off
-						else if (x < 4) Trans
+						if (x < 1) Off
+						else if (x < 3) Trans
 						else On
 					}
 					case _ => throw new Exception("Did not get expected data")
@@ -151,9 +159,43 @@ class Digital7SegElMon(input: List[PwmMon]) extends DevObserver with DevObservab
 		if (curVal != cVal) {
 			curVal = cVal
 			update()
+		} else {
+			//val st = values.foldRight(0)((a, b) => (b << 1) + a.id)
+			//println("NF: " + st + ": " + values.mkString(","))
 		}
 		notifyObservers(curVal)
 	}
 
+}
+
+//input must be val https://issues.scala-lang.org/browse/SI-4396
+//This class allows other LEDs to settle before fireing an event.
+class Digital7SegElMons(val input: List[List[PwmMon]]) extends SpicSimDev(input.head.head) with DevObserver with DevObservable {
+
+	val ssegs = for (x <- input) yield {
+		val dlm = new Digital7SegElMon(x)
+		dlm.addObserver(this)
+		dlm
+	}
+
+	private var queued = false
+
+	val sMon = new Simulator.Event() {
+		def fire {
+			queued = false
+			updateAndNotify(ssegs.map(_.value))
+		}
+	}
+
+	def notify(subject: Any, data: Any) {
+		subject match {
+			case c: Digital7SegElMon =>
+				if (!queued) {
+					queued = true
+					clock.insertEvent(sMon, clock.millisToCycles(25))
+				}
+			case _ => throw new Exception("Did not get a Digital7SegElMon")
+		}
+	}
 }
 
