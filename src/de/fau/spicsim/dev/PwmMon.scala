@@ -50,7 +50,7 @@ class PwmMon(ssdu: SpicSimDevUpdater) extends SpicSimDev(ssdu) {
 				//Add
 				curlevel = level;
 				if (monticks > 0) state += { if (curlevel) On(tm) else Off(tm) }
-				observers.foreach(_._1.notify(this, null))
+				observers.foreach(_._1.notify(this, curlevel))
 				true
 
 			}

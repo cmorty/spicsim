@@ -18,7 +18,7 @@ class PWMLowPass(pwmMon: PwmMon, time:Long = (30))  extends SpicSimDev(pwmMon) w
 	def flux = pwmMon.flux(time)
 	
 	def notify(subject:Any, data:Any){
-		updateAndNotify()
+		updateAndNotify(data)
 	}
 	
 	def level:Float = {
