@@ -59,7 +59,7 @@ class SlideMonitor(js: JSlider, pc: AdcInterface) {
 class SSegMon(ss: SevenSeg, el: Int, input: PwmMon) extends DevObserver {
 	val col = Color.red
 
-	val dlp = new DiscreteLowPass(new PWMLowPass(input), 255)
+	val dlp = new DiscreteLowPass(new PWMLowPass(input), 256)
 	dlp.addObserver(this)
 
 	notify(dlp, null)
@@ -82,7 +82,7 @@ class SSegMon(ss: SevenSeg, el: Int, input: PwmMon) extends DevObserver {
 
 class LedMon(led: Led, input: PwmMon) extends DevObserver {
 
-	val dlp = new DiscreteLowPass(new PWMLowPass(input), 255)
+	val dlp = new DiscreteLowPass(new PWMLowPass(input), 256)
 	dlp.addObserver(this)
 	notify(dlp, null)
 
