@@ -27,7 +27,7 @@ import de.fau.spicsim.gui.StackPanel
 import de.fau.spicsim.dev.StackMon
 import de.fau.spicsim.dev.SevenSegDev
 import de.fau.spicsim.dev.AdcDev
-import de.fau.spicsim.dev.PinDev
+import de.fau.spicsim.dev.ButtonDev
 import de.fau.spicsim.interfaces.SpicSimDevUpdater
 import de.fau.spicsim.interfaces.SpicSimDev
 
@@ -62,9 +62,9 @@ class SpicSim() extends SpicSimDevUpdater {
 	val ledwatch = new LedDev(this)
 	val segwatch = new SevenSegDev(this)
 	val adcdev = new AdcDev(this)
-	val pindev = new PinDev(this)
+	val buttondev = new ButtonDev(this)
 
-	val devs = List(ledwatch, segwatch, adcdev, pindev)
+	val devs = List(ledwatch, segwatch, adcdev, buttondev)
 
 	val freq = 1 * 1000 * 1000 // 1 MHz
 

@@ -3,7 +3,6 @@ package de.fau.spicsim.gui
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
-
 import de.fau.spicsim.SpicSim
 import de.fau.spicsim.dev.DiscreteLowPass
 import de.fau.spicsim.dev.PWMLowPass
@@ -17,18 +16,15 @@ import javax.swing.JFileChooser
 import javax.swing.JSlider
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
+import de.fau.spicsim.dev.Button
 
-class ButtonMonitor(jb: JButton, pc: PinInterface) {
+class ButtonMonitor(jb: JButton, btn: Button) {
 
 	val bModel = jb.getModel
 
 	val cl = new ChangeListener {
 		def stateChanged(cEvt: ChangeEvent) {
-			if (bModel.isPressed()) {
-				pc.setInput(PinTristate.Low)
-			} else if (!bModel.isPressed()) {
-				pc.setInput(PinTristate.HighZ)
-			}
+			btn.pressed = bModel.isPressed()
 		}
 	}
 
@@ -113,8 +109,8 @@ class Gui(ssim: SpicSim) {
 	lastpath = "."
 
 	val bm = List(
-		{ new ButtonMonitor(mw.btn(0), ssim.pindev.pin(0)) },
-		{ new ButtonMonitor(mw.btn(1), ssim.pindev.pin(1)) }
+		{ new ButtonMonitor(mw.btn(0), ssim.buttondev.btns(0)) },
+		{ new ButtonMonitor(mw.btn(1), ssim.buttondev.btns(1)) }
 	)
 
 	//Connect Adc
