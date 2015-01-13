@@ -1,14 +1,8 @@
-package de.fau.spicsim.text
+package de.fau.spicsim.dev
 
-import de.fau.spicsim.dev.DevObservable
-import de.fau.spicsim.interfaces.DevObserver
-import de.fau.spicsim.dev.PwmMon
-import de.fau.spicsim.dev.DiscreteLowPass
-import de.fau.spicsim.dev.PWMLowPass
-import de.fau.spicsim.dev.SevenSegDev
-import de.fau.spicsim.dev.PwmMon
-import de.fau.spicsim.interfaces.SpicSimDev
 import avrora.sim.Simulator
+import de.fau.spicsim.interfaces.DevObserver
+import de.fau.spicsim.interfaces.SpicSimDev
 
 object LedState extends Enumeration {
 	type LedState = Value
@@ -17,6 +11,8 @@ object LedState extends Enumeration {
 	val Trans = Value(-1)
 
 }
+
+import LedState._
 
 class DigitalLedMon(input: PwmMon) extends DevObserver with DevObservable {
 

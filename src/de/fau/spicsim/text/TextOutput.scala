@@ -1,21 +1,17 @@
 package de.fau.spicsim.text
 
-import java.awt.Color
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
-import de.fau.spicsim.SpicSim
-import de.fau.spicsim.dev.DiscreteLowPass
-import de.fau.spicsim.dev.PWMLowPass
-import de.fau.spicsim.dev.PwmMon
-import de.fau.spicsim.interfaces.AdcInterface
-import de.fau.spicsim.interfaces.DevObserver
-import de.fau.spicsim.interfaces.PinInterface
-import de.fau.spicsim.interfaces.PinTristate
 import java.io.OutputStream
-import de.fau.spicsim.gui.SevenSeg
-import de.fau.spicsim.interfaces.DevObserver
-import de.fau.spicsim.text.LedState._
 import java.io.PrintStream
+
+import de.fau.spicsim.SpicSim
+import de.fau.spicsim.dev.Digital7SegElMons
+import de.fau.spicsim.dev.DigitalLedMon
+import de.fau.spicsim.dev.DigitalLedsMon
+import de.fau.spicsim.dev.LedState.LedState
+import de.fau.spicsim.dev.LedState.Off
+import de.fau.spicsim.dev.LedState.On
+import de.fau.spicsim.dev.LedState.Trans
+import de.fau.spicsim.interfaces.DevObserver
 
 class TextOutput(ssim: SpicSim, os: OutputStream) {
 
