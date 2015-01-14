@@ -7,35 +7,46 @@ import avrora.sim.mcu.ADC
 import avrora.sim.mcu.ADC.ADCInput
 import java.awt.Adjustable
 import javax.swing.JSlider
-import de.fau.spicsim.interfaces.AdcInterface
 import de.fau.spicsim.interfaces.SpicSimDev
 import de.fau.spicsim.interfaces.SpicSimDevUpdater
+
+/*
+ * Used trait to support closures
+ */
+trait Adc extends DevObservable {
+	def voltage: Float
+	def voltage_=(v: Float): Unit
+	def level_=(level: Int): Unit
+	def level: Int
+}
 
 class AdcDev(ssdu: SpicSimDevUpdater) extends SpicSimDev(ssdu) {
 
 	var refvolt: Float = 5
 
-	class Adc() extends ADCInput with AdcInterface with DevObservable {
+	class lAdc() extends ADCInput with Adc {
 		private var volt: Float = refvolt / 2
 
 		def getVoltage: Float = volt
 
-		def setVoltage(v: Float) {
+		def voltage = volt
+
+		def voltage_=(v: Float) {
 			if (volt != v) {
 				volt = v
 				updateAndNotify
 			}
 		}
 
-		def setLevel(level: Int) {
-			setVoltage(refvolt * level / 1024)
+		def level_=(level: Int) {
+			voltage = refvolt * level / 1024
 		}
 
-		def getLevel = (volt * 1024 / refvolt).toInt
+		def level = (volt * 1024 / refvolt).toInt
 
 	}
 
-	val adcs = List.fill(2)(new Adc)
+	val adcs = List.fill(2)(new lAdc)
 
 	override def registerSim(sim: Simulator) {
 		super.registerSim(sim)

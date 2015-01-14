@@ -7,7 +7,6 @@ import de.fau.spicsim.SpicSim
 import de.fau.spicsim.dev.DiscreteLowPass
 import de.fau.spicsim.dev.PWMLowPass
 import de.fau.spicsim.dev.PwmMon
-import de.fau.spicsim.interfaces.AdcInterface
 import de.fau.spicsim.interfaces.DevObserver
 import de.fau.spicsim.interfaces.PinInterface
 import de.fau.spicsim.interfaces.PinTristate
@@ -17,6 +16,7 @@ import javax.swing.JSlider
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 import de.fau.spicsim.dev.Button
+import de.fau.spicsim.dev.Adc
 
 class ButtonMonitor(jb: JButton, btn: Button) {
 
@@ -31,18 +31,18 @@ class ButtonMonitor(jb: JButton, btn: Button) {
 	jb.addChangeListener(cl)
 }
 
-class SlideMonitor(js: JSlider, pc: AdcInterface) {
+class SlideMonitor(js: JSlider, pc: Adc) {
 
 	val cl = new ChangeListener {
 		def stateChanged(cEvt: ChangeEvent) {
-			pc.setLevel(js.getValue)
+			pc.level = js.getValue
 		}
 	}
 	js.addChangeListener(cl)
 
 	val devo = new DevObserver {
 		def notify(subject: Any, data: Any) {
-			js.setValue(pc.getLevel.min(js.getMaximum()))
+			js.setValue(pc.level.min(js.getMaximum()))
 		}
 	}
 
