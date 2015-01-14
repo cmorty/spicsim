@@ -62,7 +62,7 @@ class TextOutput(ssim: SpicSim, os: OutputStream) {
 	}
 	ledsMon.addObserver(ledsO)
 
-	val SsegMon = new Digital7SegElMons(ssim.segwatch.segc)
+	val sSegMon = new Digital7SegElMons(ssim.segwatch.segc)
 	val segO = new DevObserver {
 		def notify(subject: Any, data: Any) {
 			data match {
@@ -77,7 +77,29 @@ class TextOutput(ssim: SpicSim, os: OutputStream) {
 			}
 		}
 	}
-	SsegMon.addObserver(segO)
+	sSegMon.addObserver(segO)
+
+	val btns = for (b <- 0 to 1) yield {
+		val btn = ssim.buttondev.btns(b)
+		val ob = new DevObserver {
+			def notify(subject: Any, data: Any) {
+				ps.println("Button" + b + ": " + { if (btn.pressed) "pressed" else "released" })
+			}
+		}
+		btn.addObserver(ob)
+		ob
+	}
+
+	val adcs = for (a <- 0 to 1) yield {
+		val adc = ssim.adcdev.adc(a)
+		val ob = new DevObserver {
+			def notify(subject: Any, data: Any) {
+				ps.println("Adc: " + "%4d".format(adc.level.min(1023)) + " / " + "%01.3f".format(adc.voltage) + "V")
+			}
+		}
+		adc.addObserver(ob)
+		ob
+	}
 
 }
 
