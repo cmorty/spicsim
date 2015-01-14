@@ -38,8 +38,8 @@ class AdcDev(ssdu: SpicSimDevUpdater) extends SpicSimDev(ssdu) {
 			}
 		}
 
-		def level_=(level: Int) {
-			voltage = refvolt * level / 1024
+		def level_=(l: Int) {
+			voltage = refvolt * l / 1024
 		}
 
 		def level = (volt * 1024 / refvolt).toInt
