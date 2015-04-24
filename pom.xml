@@ -90,8 +90,8 @@
 				</executions>
 				<configuration>
 					<scalaVersion>2.11.0</scalaVersion>
-					<recompileMode>incremental</recompileMode>
-					<useZincServer>true</useZincServer>
+<!--					<recompileMode>incremental</recompileMode>
+					<useZincServer>true</useZincServer> -->
 					<args>
 						<arg>-unchecked</arg>
 						<arg>-deprecation</arg>
